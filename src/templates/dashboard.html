@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Monitoring Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .temperature {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3c72;
+            margin: 10px 0;
+        }
+
+        .weather-condition {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .alerts {
+            background: #fff3f3;
+            border-left: 4px solid #ff4444;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .city-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .city-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            color: #1e3c72;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .city-button.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .trend-down {
+            background: #fbe9e7;
+            color: #c62828;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Real-time Weather Monitoring System</h1>
+            <p>Last updated: <span id="last-update">2024-10-22 14:30:00</span></p>
+        </div>
+
+        <div class="city-list">
+            <button class="city-button active">Delhi</button>
+            <button class="city-button">Mumbai</button>
+            <button class="city-button">Chennai</button>
+            <button class="city-button">Bangalore</button>
+            <button class="city-button">Kolkata</button>
+            <button class="city-button">Hyderabad</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Current Temperature</div>
+                    <div class="trend-indicator trend-up">↑ 2.3°C</div>
+                </div>
+                <div class="temperature">32.5°C</div>
+                <div class="weather-condition">
+                    ☀️ Clear Sky
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Daily Summary</div>
+                </div>
+                <div>
+                    <p>Max: 35.2°C</p>
+                    <p>Min: 24.8°C</p>
+                    <p>Avg: 29.5°C</p>
+                    <p>Dominant Condition: Clear</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Alerts</div>
+                </div>
+                <div class="alerts">
+                    <p>⚠️ Temperature exceeded 35°C at 14:15:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic interactivity for city buttons
+        document.querySelectorAll('.city-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.city-button').forEach(btn =>
+                    btn.classList.remove('active')
+                );
+                // Add active class to clicked button
+                button.classList.add('active');
+            });
+        });
+
+        let currentCity = 'Delhi';  // Default city
+
+        async function fetchWeatherData(city) {
+            try {
+                const response = await fetch(`/api/weather/${city}`);
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            const current = data.current;
+            const trend = data.trend;
+            const summary = data.daily_summary;
+
+            // Update temperature card
+            document.querySelector('.temperature').textContent = `${current.temp.toFixed(1)}°C`;
+            document.querySelector('.trend-indicator').textContent = `${trend.direction} ${trend.value.toFixed(1)}°C`;
+            document.querySelector('.weather-condition').textContent = `${current.main}`;
+
+            // Update daily summary
+            const summaryHTML = `
+                <p>Max: ${summary.max_temp.toFixed(1)}°C</p>
+                <p>Min: ${summary.min_temp.toFixed(1)}°C</p>
+                <p>Avg: ${summary.avg_temp.toFixed(1)}°C</p>
+                <p>Dominant Condition: ${summary.dominant_condition}</p>
+            `;
+            document.querySelector('.card:nth-child(2) div:not(.card-header)').innerHTML = summaryHTML;
+
+            // Update alerts
+            const alertsContainer = document.querySelector('.alerts');
+            alertsContainer.innerHTML = data.alerts.length > 0
+                ? data.alerts.map(alert => `<p>${alert}</p>`).join('')
+                : '<p>No active alerts</p>';
+
+            // Update timestamp
+            document.getElementById('last-update').textContent = new Date().toLocaleString();
+        }
+
+        // Initial fetch for default city
+        fetchWeatherData(currentCity);
+
+        // Handle city change
+        document.querySelectorAll('.city-button').forEach(button => {
+            button.addEventListener('click', () => {
+                currentCity = button.textContent.trim();
+                fetchWeatherData(currentCity);
+            });
+        });
+    </script>
+</body>
+</html>

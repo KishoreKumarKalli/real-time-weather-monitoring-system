@@ -1,0 +1,26 @@
+{
+    "api_key": "f7b8eb773b8323e3a26b50602d6f06fb",
+    "temp_threshold": 35,
+    "consecutive_checks": 2,
+    "update_interval": 300,
+    "visualization_update_interval": 3600,
+    "store_historical_data": true,
+    "forecast_enabled": true,
+    "cities": [
+        "Delhi",
+        "Mumbai",
+        "Chennai",
+        "Bangalore",
+        "Kolkata",
+        "Hyderabad"
+    ],
+    "enable_email_alerts": false,
+    "email_config": {
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "username": "your-email@gmail.com",
+        "password": "your-app-password",
+        "from_email": "your-email@gmail.com",
+        "to_email": "recipient@email.com"
+    }
+}

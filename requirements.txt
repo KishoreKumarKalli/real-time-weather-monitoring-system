@@ -1,0 +1,8 @@
+flask
+requests
+schedule
+pandas
+matplotlib
+sqlite3
+pytest
+smtplib
